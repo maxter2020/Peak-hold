@@ -48,7 +48,7 @@
 		1A6E155F24BDE01900460927 /* Peak Hold 2UITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Peak Hold 2UITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		1A6E156324BDE01900460927 /* Peak_Hold_2UITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Peak_Hold_2UITests.swift; sourceTree = "<group>"; };
 		1A6E156524BDE01900460927 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		1A6E157124BDE04700460927 /* ViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ViewController.swift; path = "../../Peak hold first attempt/SpokenWord/ViewController.swift"; sourceTree = "<group>"; };
+		1A6E157124BDE04700460927 /* ViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
