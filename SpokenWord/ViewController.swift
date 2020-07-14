@@ -8,145 +8,127 @@ The root view controller that provides a button to start and stop recording, and
 import UIKit
 import Speech
 
+var peakHold = Float(-100)
+var r = 0
+let n = 15
+let dropSpeed = Float(1.5)
+
 public class ViewController: UIViewController, SFSpeechRecognizerDelegate {
     // MARK: Properties
     
-    private let speechRecognizer = SFSpeechRecognizer(locale: Locale(identifier: "en-US"))!
-    
-    private var recognitionRequest: SFSpeechAudioBufferRecognitionRequest?
-    
-    private var recognitionTask: SFSpeechRecognitionTask?
-    
     private let audioEngine = AVAudioEngine()
     
-    @IBOutlet var textView: UITextView!
+    @IBOutlet weak var display: UIView!
     
     @IBOutlet var recordButton: UIButton!
+    
+    var background: UIView!
+    
+    var bar: UIView!
+    
+    var line: UIView!
     
     // MARK: View Controller Lifecycle
     
     public override func viewDidLoad() {
+        
         super.viewDidLoad()
         
-        // Disable the record buttons until authorization has been granted.
-        recordButton.isEnabled = false
-    }
-    
-    override public func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
-        // Configure the SFSpeechRecognizer object already
-        // stored in a local member variable.
-        speechRecognizer.delegate = self
+        background = UIView(frame: CGRect(x: 150, y: 300, width: 100, height: 400))
+        background.backgroundColor=UIColor.lightGray
+        self.view.addSubview(background)
         
-        // Asynchronously make the authorization request.
-        SFSpeechRecognizer.requestAuthorization { authStatus in
-
-            // Divert to the app's main thread so that the UI
-            // can be updated.
-            OperationQueue.main.addOperation {
-                switch authStatus {
-                case .authorized:
-                    self.recordButton.isEnabled = true
-                    
-                case .denied:
-                    self.recordButton.isEnabled = false
-                    self.recordButton.setTitle("User denied access to speech recognition", for: .disabled)
-                    
-                case .restricted:
-                    self.recordButton.isEnabled = false
-                    self.recordButton.setTitle("Speech recognition restricted on this device", for: .disabled)
-                    
-                case .notDetermined:
-                    self.recordButton.isEnabled = false
-                    self.recordButton.setTitle("Speech recognition not yet authorized", for: .disabled)
-                    
-                default:
-                    self.recordButton.isEnabled = false
-                }
-            }
-        }
+        bar = UIView(frame: CGRect(x: 150, y: 350, width: 100, height: 0))
+        bar.backgroundColor=UIColor.green
+        self.view.addSubview(bar)
+        
+        line = UIView(frame: CGRect(x: 150, y: 698, width: 100, height: 2))
+        line.backgroundColor=UIColor.green
+        self.view.addSubview(line)
     }
     
     private func startRecording() throws {
         
-        // Cancel the previous task if it's running.
-        recognitionTask?.cancel()
-        self.recognitionTask = nil
-        
         // Configure the audio session for the app.
         let audioSession = AVAudioSession.sharedInstance()
         try audioSession.setCategory(.record, mode: .measurement, options: .duckOthers)
+        try audioSession.setPreferredSampleRate(48000)
         try audioSession.setActive(true, options: .notifyOthersOnDeactivation)
         let inputNode = audioEngine.inputNode
 
-        // Create and configure the speech recognition request.
-        recognitionRequest = SFSpeechAudioBufferRecognitionRequest()
-        guard let recognitionRequest = recognitionRequest else { fatalError("Unable to create a SFSpeechAudioBufferRecognitionRequest object") }
-        recognitionRequest.shouldReportPartialResults = true
-        
-        // Keep speech recognition data on device
-        if #available(iOS 13, *) {
-            recognitionRequest.requiresOnDeviceRecognition = false
-        }
-        
-        // Create a recognition task for the speech recognition session.
-        // Keep a reference to the task so that it can be canceled.
-        recognitionTask = speechRecognizer.recognitionTask(with: recognitionRequest) { result, error in
-            var isFinal = false
-            
-            if let result = result {
-                // Update the text view with the results.
-                self.textView.text = result.bestTranscription.formattedString
-                isFinal = result.isFinal
-                print("Text \(result.bestTranscription.formattedString)")
-            }
-            
-            if error != nil || isFinal {
-                // Stop recognizing speech if there is a problem.
-                self.audioEngine.stop()
-                inputNode.removeTap(onBus: 0)
-
-                self.recognitionRequest = nil
-                self.recognitionTask = nil
-
-                self.recordButton.isEnabled = true
-                self.recordButton.setTitle("Start Recording", for: [])
-            }
-        }
-
         // Configure the microphone input.
-        let recordingFormat = inputNode.outputFormat(forBus: 0)
-        inputNode.installTap(onBus: 0, bufferSize: 1024, format: recordingFormat) { (buffer: AVAudioPCMBuffer, when: AVAudioTime) in
-            self.recognitionRequest?.append(buffer)
-        }
+        let bus = 0
+        let inputFormat = inputNode.outputFormat(forBus: bus )
         
+        inputNode.removeTap(onBus: bus)
+
+        // Sample rate here frigged to give us 1024 samples a second, play around with this...!
+        guard let outputFormat = AVAudioFormat(commonFormat: .pcmFormatFloat32, sampleRate: 10240, channels: 1, interleaved: true), let converter = AVAudioConverter(from: inputFormat, to: outputFormat) else{
+            return
+        }
+
+        inputNode.installTap(onBus: bus, bufferSize: 1024, format: inputFormat) { (buffer, time) -> Void in
+            var newBufferAvailable = true
+
+            let inputCallback: AVAudioConverterInputBlock = { inNumPackets, outStatus in
+                if newBufferAvailable {
+                    outStatus.pointee = .haveData
+                    newBufferAvailable = false
+                    return buffer
+                } else {
+                    outStatus.pointee = .noDataNow
+                    return nil
+                }
+            }
+
+            if let convertedBuffer = AVAudioPCMBuffer(pcmFormat: outputFormat, frameCapacity: AVAudioFrameCount(outputFormat.sampleRate) * buffer.frameLength / AVAudioFrameCount(buffer.format.sampleRate)){
+                var error: NSError?
+                let status = converter.convert(to: convertedBuffer, error: &error, withInputFrom: inputCallback)
+                assert(status != .error)
+
+                if let buffer = convertedBuffer.floatChannelData?.pointee {
+                    let bufferPointer = UnsafeBufferPointer<Float>(start: buffer, count: Int(convertedBuffer.frameLength))
+
+                    let floats = Array(bufferPointer)
+                    
+                    
+                    let squares = floats.map{pow($0,2)}
+                    let mean = squares.reduce(0,+) / Float(squares.count)
+                    let root = pow(mean,0.5)
+                    let vu=20*log10(root)
+                    if vu > peakHold{
+                        peakHold = vu
+                        r = 0
+                    }
+                    else if r > n{
+                        peakHold = peakHold - dropSpeed
+                    }
+                    else{
+                        r+=1
+                    }
+                    
+                    let normalisedVu = pow(10,vu/80)
+                    let normalisedPeakHold = pow(10,peakHold/80)
+                    
+                    DispatchQueue.main.async {
+                        self.bar.frame =
+                            CGRect(x: 150, y: 700 - 400*CGFloat(normalisedVu), width: 100, height: 400*CGFloat(normalisedVu))
+                        
+                        self.line.frame =
+                            CGRect(x: 150, y: 700 - 400*CGFloat(normalisedPeakHold), width: 100, height: 2)
+                    }
+                }
+            }
+        }
+
         audioEngine.prepare()
         try audioEngine.start()
-        
-        // Let the user know to start talking.
-        textView.text = "(Go ahead, I'm listening)"
     }
-    
-    // MARK: SFSpeechRecognizerDelegate
-    
-    public func speechRecognizer(_ speechRecognizer: SFSpeechRecognizer, availabilityDidChange available: Bool) {
-        if available {
-            recordButton.isEnabled = true
-            recordButton.setTitle("Start Recording", for: [])
-        } else {
-            recordButton.isEnabled = false
-            recordButton.setTitle("Recognition Not Available", for: .disabled)
-        }
-    }
-    
-    // MARK: Interface Builder actions
     
     @IBAction func recordButtonTapped() {
         if audioEngine.isRunning {
             audioEngine.stop()
-            recognitionRequest?.endAudio()
-            recordButton.isEnabled = false
-            recordButton.setTitle("Stopping", for: .disabled)
+            recordButton.setTitle("Start recording", for: .disabled)
         } else {
             do {
                 try startRecording()
@@ -157,4 +139,3 @@ public class ViewController: UIViewController, SFSpeechRecognizerDelegate {
         }
     }
 }
-
