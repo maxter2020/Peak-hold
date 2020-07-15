@@ -2,7 +2,7 @@
 //  AppDelegate.swift
 //  Peak Hold
 //
-//  Created by James Booth on 14/07/2020.
+//  Created by Max Booth on 14/07/2020.
 //  Copyright © 2020 Max Booth. All rights reserved.
 //
 

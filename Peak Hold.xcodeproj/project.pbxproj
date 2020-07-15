@@ -14,6 +14,8 @@
 		1A63DBC724BDE8DB00BEFCA5 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1A63DBC624BDE8DB00BEFCA5 /* Assets.xcassets */; };
 		1A63DBCA24BDE8DB00BEFCA5 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 1A63DBC824BDE8DB00BEFCA5 /* LaunchScreen.storyboard */; };
 		1A63DBD524BDE8DB00BEFCA5 /* Peak_HoldTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A63DBD424BDE8DB00BEFCA5 /* Peak_HoldTests.swift */; };
+		1A63DBE024BDFAED00BEFCA5 /* PeakHoldCalculator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A63DBDF24BDFAED00BEFCA5 /* PeakHoldCalculator.swift */; };
+		1A63DBE124BDFAED00BEFCA5 /* PeakHoldCalculator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A63DBDF24BDFAED00BEFCA5 /* PeakHoldCalculator.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -38,6 +40,7 @@
 		1A63DBD024BDE8DB00BEFCA5 /* Peak HoldTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Peak HoldTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		1A63DBD424BDE8DB00BEFCA5 /* Peak_HoldTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Peak_HoldTests.swift; sourceTree = "<group>"; };
 		1A63DBD624BDE8DB00BEFCA5 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		1A63DBDF24BDFAED00BEFCA5 /* PeakHoldCalculator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PeakHoldCalculator.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -82,6 +85,7 @@
 				1A63DBBD24BDE8DA00BEFCA5 /* AppDelegate.swift */,
 				1A63DBBF24BDE8DA00BEFCA5 /* SceneDelegate.swift */,
 				1A63DBC124BDE8DA00BEFCA5 /* ViewController.swift */,
+				1A63DBDF24BDFAED00BEFCA5 /* PeakHoldCalculator.swift */,
 				1A63DBC324BDE8DA00BEFCA5 /* Main.storyboard */,
 				1A63DBC624BDE8DB00BEFCA5 /* Assets.xcassets */,
 				1A63DBC824BDE8DB00BEFCA5 /* LaunchScreen.storyboard */,
@@ -201,6 +205,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				1A63DBC224BDE8DA00BEFCA5 /* ViewController.swift in Sources */,
+				1A63DBE024BDFAED00BEFCA5 /* PeakHoldCalculator.swift in Sources */,
 				1A63DBBE24BDE8DA00BEFCA5 /* AppDelegate.swift in Sources */,
 				1A63DBC024BDE8DA00BEFCA5 /* SceneDelegate.swift in Sources */,
 			);
@@ -211,6 +216,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				1A63DBD524BDE8DB00BEFCA5 /* Peak_HoldTests.swift in Sources */,
+				1A63DBE124BDFAED00BEFCA5 /* PeakHoldCalculator.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

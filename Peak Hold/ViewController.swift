@@ -9,9 +9,10 @@ import UIKit
 import Speech
 
 var peakHold = Float(-100)
-var r = 0
-let n = 15
+var counter = -1
+let holdTime = 15
 let dropSpeed = Float(1.5)
+var record: [[Float]] = []
 
 public class ViewController: UIViewController, SFSpeechRecognizerDelegate {
     // MARK: Properties
@@ -47,7 +48,7 @@ public class ViewController: UIViewController, SFSpeechRecognizerDelegate {
         self.view.addSubview(line)
     }
     
-    private func startRecording() throws {
+    public func startRecording() throws {
         
         // Configure the audio session for the app.
         let audioSession = AVAudioSession.sharedInstance()
@@ -90,25 +91,15 @@ public class ViewController: UIViewController, SFSpeechRecognizerDelegate {
                     let bufferPointer = UnsafeBufferPointer<Float>(start: buffer, count: Int(convertedBuffer.frameLength))
 
                     let floats = Array(bufferPointer)
+                    record.append(floats)
                     
+                    let output = PeakHold.peakHoldCalculator1(audio: floats, peakHoldIn: peakHold, counterIn: counter, holdTime: holdTime, dropSpeed: dropSpeed)
                     
-                    let squares = floats.map{pow($0,2)}
-                    let mean = squares.reduce(0,+) / Float(squares.count)
-                    let root = pow(mean,0.5)
-                    let vu=20*log10(root)
-                    if vu > peakHold{
-                        peakHold = vu
-                        r = 0
-                    }
-                    else if r > n{
-                        peakHold = peakHold - dropSpeed
-                    }
-                    else{
-                        r+=1
-                    }
+                    peakHold = output.peakHold
+                    counter = output.counter
                     
-                    let normalisedVu = pow(10,vu/80)
-                    let normalisedPeakHold = pow(10,peakHold/80)
+                    let normalisedVu = pow(10,output.vu/80)
+                    let normalisedPeakHold = pow(10,output.peakHold/80)
                     
                     DispatchQueue.main.async {
                         self.bar.frame =
@@ -128,7 +119,8 @@ public class ViewController: UIViewController, SFSpeechRecognizerDelegate {
     @IBAction func recordButtonTapped() {
         if audioEngine.isRunning {
             audioEngine.stop()
-            recordButton.setTitle("Start recording", for: .disabled)
+            recordButton.setTitle("Start recording", for: [])
+            print(record)
         } else {
             do {
                 try startRecording()
