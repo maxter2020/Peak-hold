@@ -12,7 +12,6 @@ var peakHold = Float(-100)
 var counter = -1
 let holdTime = 15
 let dropSpeed = Float(1.5)
-var record: [[Float]] = []
 
 public class ViewController: UIViewController, SFSpeechRecognizerDelegate {
     // MARK: Properties
@@ -89,11 +88,8 @@ public class ViewController: UIViewController, SFSpeechRecognizerDelegate {
 
                 if let buffer = convertedBuffer.floatChannelData?.pointee {
                     let bufferPointer = UnsafeBufferPointer<Float>(start: buffer, count: Int(convertedBuffer.frameLength))
-
-                    let floats = Array(bufferPointer)
-                    record.append(floats)
                     
-                    let output = PeakHold.peakHoldCalculator1(audio: floats, peakHoldIn: peakHold, counterIn: counter, holdTime: holdTime, dropSpeed: dropSpeed)
+                    let output = PeakHold.peakHoldCalculatorPointers2(data: bufferPointer, peakHoldIn: peakHold, counterIn: counter, holdTime: holdTime, dropSpeed: dropSpeed)
                     
                     peakHold = output.peakHold
                     counter = output.counter
@@ -120,7 +116,6 @@ public class ViewController: UIViewController, SFSpeechRecognizerDelegate {
         if audioEngine.isRunning {
             audioEngine.stop()
             recordButton.setTitle("Start recording", for: [])
-            print(record)
         } else {
             do {
                 try startRecording()

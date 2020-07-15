@@ -32,18 +32,20 @@ class Peak_HoldTests: XCTestCase {
     
     func testPerformanceExample() {
         
-        var testArrays: [[Float]] = []
-        for _ in 0...99 {
-            var testArray: [Float] = []
-            for _ in 0...999 {
-                testArray.append(Float.random(in: -1..<1))
+        var testData: [UnsafeBufferPointer<Float>] = []
+        for _ in 0...999 {
+            let testPointers = UnsafeMutablePointer<Float>.allocate(capacity: 1024)
+            let testBuffer: UnsafeBufferPointer<Float>
+            for i in 0...1023 {
+                testPointers[i] = Float.random(in: -1..<1)
             }
-            testArrays.append(testArray)
+            testBuffer = UnsafeBufferPointer(start: testPointers, count: 1024)
+            testData.append(testBuffer)
         }
         
         self.measure {
-            for i in 0...99{
-                let output = PeakHold.peakHoldCalculator1(audio: testArrays[i], peakHoldIn: peakHold, counterIn: counter, holdTime: holdTime, dropSpeed: dropSpeed)
+            for i in 0...999{
+                let output = PeakHold.peakHoldCalculatorPointers2(data: testData[i], peakHoldIn: peakHold, counterIn: counter, holdTime: holdTime, dropSpeed: dropSpeed)
                 peakHold = output.peakHold
                 counter = output.counter
             }
