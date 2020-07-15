@@ -40,30 +40,30 @@ class Peak_HoldTests: XCTestCase {
         // Use XCTAssert and related functions to verify your tests produce the correct results.
     }
     
-    func testPerformanceExamplePointers1() {
+    func testPeakHoldCalculatorSlow() {
         self.measure {
             for i in 0...9999{
-                let output = PeakHold.peakHoldCalculatorPointers1(data: testData[i], peakHoldIn: peakHold, counterIn: counter, holdTime: holdTime, dropSpeed: dropSpeed)
+                let output = PeakHold.peakHoldCalculatorSlow(data: testData[i], peakHoldIn: peakHold, counterIn: counter, holdTime: holdTime, dropSpeed: dropSpeed)
                 peakHold = output.peakHold
                 counter = output.counter
             }
         }
     }
     
-    func testPerformanceExamplePointers2() {
+    func testPeakHoldCalculatorMedium() {
         self.measure {
             for i in 0...9999{
-                let output = PeakHold.peakHoldCalculatorPointers2(data: testData[i], peakHoldIn: peakHold, counterIn: counter, holdTime: holdTime, dropSpeed: dropSpeed)
+                let output = PeakHold.peakHoldCalculatorMedium(data: testData[i], peakHoldIn: peakHold, counterIn: counter, holdTime: holdTime, dropSpeed: dropSpeed)
                 peakHold = output.peakHold
                 counter = output.counter
             }
         }
     }
     
-    func testPerformanceExample1() {
+    func testPeakHoldCalculatorFastest() {
         self.measure {
             for i in 0...9999{
-                let output = PeakHold.peakHoldCalculator1(data: testData[i], peakHoldIn: peakHold, counterIn: counter, holdTime: holdTime, dropSpeed: dropSpeed)
+                let output = PeakHold.peakHoldCalculatorFastest(data: testData[i], peakHoldIn: peakHold, counterIn: counter, holdTime: holdTime, dropSpeed: dropSpeed)
                 peakHold = output.peakHold
                 counter = output.counter
             }

@@ -89,7 +89,7 @@ public class ViewController: UIViewController, SFSpeechRecognizerDelegate {
                 if let buffer = convertedBuffer.floatChannelData?.pointee {
                     let bufferPointer = UnsafeBufferPointer<Float>(start: buffer, count: Int(convertedBuffer.frameLength))
                     
-                    let output = PeakHold.peakHoldCalculatorPointers2(data: bufferPointer, peakHoldIn: peakHold, counterIn: counter, holdTime: holdTime, dropSpeed: dropSpeed)
+                    let output = PeakHold.peakHoldCalculatorFastest(data: bufferPointer, peakHoldIn: peakHold, counterIn: counter, holdTime: holdTime, dropSpeed: dropSpeed)
                     
                     peakHold = output.peakHold
                     counter = output.counter
