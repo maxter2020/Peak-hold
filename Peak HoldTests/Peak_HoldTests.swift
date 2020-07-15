@@ -17,8 +17,18 @@ var floats: [Float] = Array(repeating: 0, count: 1000)
 
 class Peak_HoldTests: XCTestCase {
     
+    var testData: [UnsafeBufferPointer<Float>] = []
+    
     override func setUp() {
-        // Put setup code here. This method is called before the invocation of each test method in the class.
+        for _ in 0...9999 {
+            let testPointers = UnsafeMutablePointer<Float>.allocate(capacity: 1024)
+            let testBuffer: UnsafeBufferPointer<Float>
+            for i in 0...1023 {
+                testPointers[i] = Float.random(in: -1..<1)
+            }
+            testBuffer = UnsafeBufferPointer(start: testPointers, count: 1024)
+            testData.append(testBuffer)
+        }
     }
     
     override func tearDown() {
@@ -30,22 +40,30 @@ class Peak_HoldTests: XCTestCase {
         // Use XCTAssert and related functions to verify your tests produce the correct results.
     }
     
-    func testPerformanceExample() {
-        
-        var testData: [UnsafeBufferPointer<Float>] = []
-        for _ in 0...999 {
-            let testPointers = UnsafeMutablePointer<Float>.allocate(capacity: 1024)
-            let testBuffer: UnsafeBufferPointer<Float>
-            for i in 0...1023 {
-                testPointers[i] = Float.random(in: -1..<1)
-            }
-            testBuffer = UnsafeBufferPointer(start: testPointers, count: 1024)
-            testData.append(testBuffer)
-        }
-        
+    func testPerformanceExamplePointers1() {
         self.measure {
-            for i in 0...999{
+            for i in 0...9999{
+                let output = PeakHold.peakHoldCalculatorPointers1(data: testData[i], peakHoldIn: peakHold, counterIn: counter, holdTime: holdTime, dropSpeed: dropSpeed)
+                peakHold = output.peakHold
+                counter = output.counter
+            }
+        }
+    }
+    
+    func testPerformanceExamplePointers2() {
+        self.measure {
+            for i in 0...9999{
                 let output = PeakHold.peakHoldCalculatorPointers2(data: testData[i], peakHoldIn: peakHold, counterIn: counter, holdTime: holdTime, dropSpeed: dropSpeed)
+                peakHold = output.peakHold
+                counter = output.counter
+            }
+        }
+    }
+    
+    func testPerformanceExample1() {
+        self.measure {
+            for i in 0...9999{
+                let output = PeakHold.peakHoldCalculator1(data: testData[i], peakHoldIn: peakHold, counterIn: counter, holdTime: holdTime, dropSpeed: dropSpeed)
                 peakHold = output.peakHold
                 counter = output.counter
             }

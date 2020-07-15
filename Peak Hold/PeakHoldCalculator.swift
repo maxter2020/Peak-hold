@@ -80,10 +80,10 @@ public struct PeakHold {
         return PeakHold.Output(vu: vu, peakHold: peakHold, counter: counter)
     }
     
-    public static func peakHoldCalculatorPointers2(data: UnsafeBufferPointer<Float>, peakHoldIn: Float, counterIn: Int, holdTime: Int, dropSpeed: Float) -> PeakHold.Output {
+    public static func peakHoldCalculatorPointers2(data: UnsafeBufferPointer<Float>, peakHoldIn: Float, counterIn: Int, holdTime: Int, dropSpeed: Float, sampleCount: Int = 1024) -> PeakHold.Output {
 
         let sxx = data.reduce(0, {x, y in x + pow(y,2)})
-        let mean = sxx / Float(1024)
+        let mean = sxx / Float(sampleCount)
         let root = pow(mean,0.5)
         let vu = 20*log10(root)
     
