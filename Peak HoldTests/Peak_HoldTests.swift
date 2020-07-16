@@ -69,4 +69,14 @@ class Peak_HoldTests: XCTestCase {
             }
         }
     }
+    
+    func testPeakHoldCalculatorForLoop() {
+        self.measure {
+            for i in 0...9999{
+                let output = PeakHold.peakHoldCalculatorForLoop(data: testData[i], peakHoldIn: peakHold, counterIn: counter, holdTime: holdTime, dropSpeed: dropSpeed)
+                peakHold = output.peakHold
+                counter = output.counter
+            }
+        }
+    }
 }
