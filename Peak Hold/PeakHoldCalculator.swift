@@ -103,4 +103,30 @@ public struct PeakHold {
         
         return PeakHold.Output(vu: vu, peakHold: peakHold, counter: counter)
     }
+    
+    public static func peakHoldCalculatorNotPow(data: UnsafeBufferPointer<Float>, peakHoldIn: Float, counterIn: Int, holdTime: Int, dropSpeed: Float, sampleCount: Int = 1024) -> PeakHold.Output {
+
+        var sxx: Float = 0
+        for i in 0...sampleCount-1{
+            sxx += data[i]*data[i]
+        }
+        let mean = sxx / Float(sampleCount)
+        let root = pow(mean,0.5)
+        let vu = 20*log10(root)
+    
+        var counter: Int = counterIn
+        
+        if vu > peakHoldIn{
+            peakHold = vu
+            counter = 0
+        }
+        else if counterIn > holdTime{
+            peakHold = peakHold - dropSpeed
+        }
+        else{
+            counter += 1
+        }
+        
+        return PeakHold.Output(vu: vu, peakHold: peakHold, counter: counter)
+    }
 }
